@@ -269,7 +269,7 @@ static void usb_rx_complete(struct urb *urb)
 		switch (pipe_data->format) {
 		case IF_USB_FMT_EP:
 			if (usb_ld->if_usb_is_main) {
-				pr_urb("IPC-RX", urb);
+				//pr_urb("IPC-RX", urb);
 				iod_format = IPC_FMT;
 			} else {
 				iod_format = IPC_BOOT;
@@ -478,12 +478,13 @@ static int _usb_tx_work(struct sk_buff *skb)
 	if (!pipe_data)
 		return -ENOENT;
 
+/*
 	if (iod->format == IPC_FMT && usb_ld->if_usb_is_main)
 		pr_skb("IPC-TX", skb);
 
 	if (iod->format == IPC_RAW)
 		mif_debug("TX[RAW]\n");
-
+*/
 	return usb_tx_urb_with_skb(usb_ld->usbdev, skb,	pipe_data);
 }
 
@@ -584,14 +585,6 @@ static int link_pm_runtime_get_active(struct link_pm_data *pm_data)
 
 	if (!usb_ld->if_usb_connected || usb_ld->ld.com_state == COM_NONE)
 		return -ENODEV;
-
-	if (pm_data->dpm_suspending) {
-		mif_err("Kernel in suspending try get_active later\n");
-		/* during dpm_suspending..
-		 * if AP get tx data, wake up. */
-		wake_lock(&pm_data->l2_wake);
-		return -EAGAIN;
-	}
 
 	if (dev->power.runtime_status == RPM_ACTIVE) {
 		pm_data->resume_retry_cnt = 0;
